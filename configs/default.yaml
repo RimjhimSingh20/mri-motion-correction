@@ -1,0 +1,50 @@
+experiment:
+  name: "unet3d_motion_correction"
+  output_dir: "outputs"
+  seed: 42
+
+data:
+  train_dir: "data/train"
+  val_dir: "data/val"
+  test_dir: "data/test"
+  patch_size: [64, 64, 64]
+  patch_overlap: [16, 16, 16]
+  patches_per_volume_train: 16
+  patches_per_volume_val: 4
+  num_workers: 8
+  pin_memory: true
+
+model:
+  name: "UNet3D"
+  in_channels: 1
+  out_channels: 1
+  base_features: 32
+  depth: 4
+  dropout: 0.1
+
+training:
+  epochs: 200
+  batch_size: 2
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-5
+  grad_clip: 1.0
+  mixed_precision: true
+  gradient_accumulation_steps: 4
+  scheduler:
+    warmup_epochs: 10
+    min_lr: 1.0e-6
+
+loss:
+  l1_weight: 1.0
+  ssim_weight: 0.5
+
+evaluation:
+  metrics: ["ssim", "psnr", "nrmse"]
+  save_predictions: true
+  sliding_window_overlap: 0.5
+
+logging:
+  log_interval: 10
+  val_interval: 1
+  checkpoint_interval: 10
+  use_tensorboard: true
